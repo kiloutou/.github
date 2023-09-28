@@ -1,0 +1,62 @@
+name: Notify Google Chat on new Github Pull Request 
+on:
+  pull_request:
+    types:
+      - opened
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Git PR Details
+      run: |
+          echo "PR title: ${{ github.event.pull_request.title }}"
+          echo "PR creator: ${{ github.event.pull_request.user.login }}"
+          echo "PR link: ${{ github.event.pull_request.html_url }}"
+    - name: Google Chat Notification
+      run: |
+          curl --location --request POST '${{ secrets.WEBHOOK }}' \
+          --header 'Content-Type: application/json' \
+          --data-raw '{
+              "cards": [
+                  {
+                      "header": {
+                          "title": "Nouvelle PR",
+                          "subtitle": "${{ github.event.pull_request.title }}"
+                      },
+                      "sections": [
+                          {
+                              "widgets": [
+                                  {
+                                     "keyValue": {
+                                          "topLabel": "Creator",
+                                          "content": "${{ github.event.pull_request.user.login }}"
+                                      },
+                                   },
+                                   {
+                                     "keyValue": {
+                                          "topLabel": "Title",
+                                          "content": "${{ github.event.pull_request.title }}"
+                                      }
+                                   },
+                                   {
+                                      "buttons": [
+                                          {
+                                              "textButton": {
+                                                  "text": "OPEN PR",
+                                                  "onClick": {
+                                                      "openLink": {
+                                                          "url": "${{ github.event.pull_request.html_url }}"
+                                                      }
+                                                  }
+                                              }
+                                          }
+                                      ]
+                                  }
+                              ]
+                          }
+                      ]
+                  }
+              ]
+          }'
