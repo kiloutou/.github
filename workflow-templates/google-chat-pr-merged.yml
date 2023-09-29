@@ -20,24 +20,51 @@ jobs:
           curl --location --request POST '${{ secrets.WEBHOOK }}' \
           --header 'Content-Type: application/json' \
           --data-raw '{
-              "cards": [
-                  {
-                      "header": {
-                          "title": "PR merged",
-                          "subtitle": "${{ github.event.pull_request.title }}"
-                      },
-                      "sections": [
+              "cardsV2": [
+                {
+                  "cardId": "unique-card-id",
+                  "card": {
+                    "header": {
+                      "title": "<font color=\"#1a7f37\">PR merged</font>",
+                      "subtitle": "${{ github.event.pull_request.title }}"
+                    },
+                    "sections": [
+                      {
+                        "widgets": [
                           {
-                              "widgets": [
-                                  {
-                                     "keyValue": {
-                                          "topLabel": "Merged by",
-                                          "content": "${{ github.event.pull_request.merged_by.login }}"
-                                      },
-                                   }
+                            "decoratedText": {
+                              "startIcon": {
+                                "knownIcon": "PERSON"
+                              },
+                              "text": "${{ github.event.pull_request.user.login }}"
+                            }
+                          },
+                          {
+                            "decoratedText": {
+                              "startIcon": {
+                                "knownIcon": "BOOKMARK"
+                              },
+                              "text": "${{ github.event.repository.name }}"
+                            }
+                          },
+                          {
+                            "buttonList": {
+                              "buttons": [
+                                {
+                                  "text": "OPEN PR",
+                                  "onClick": {
+                                    "openLink": {
+                                      "url": "${{ github.event.pull_request.html_url }}"
+                                    }
+                                  }
+                                }
                               ]
+                            }
                           }
-                      ]
+                        ]
+                      }
+                    ]
                   }
+                }
               ]
-          }'
+            }'

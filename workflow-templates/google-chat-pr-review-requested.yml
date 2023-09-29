@@ -19,7 +19,7 @@ jobs:
                   "cardId": "unique-card-id",
                   "card": {
                     "header": {
-                      "title": "Nouvelle PR",
+                      "title": "<font color=\"#2F81F7\">New PR</font>",
                       "subtitle": "${{ github.event.pull_request.title }}"
                     },
                     "sections": [
