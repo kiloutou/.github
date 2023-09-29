@@ -1,0 +1,6 @@
+{
+  "name": "Notification on Pull Request merged",
+  "description": "Sends a Google Chat notification when someone merges a Pull Request.",
+  "iconName": "octicon git-merge",
+  "categories": ["code-review"]
+}
