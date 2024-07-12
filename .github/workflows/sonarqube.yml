@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Check SonarQube availability
         run: |
-          curl -sSf http://http://sonarqube:9000/api/system/status || exit 1
+          curl -sSf http://http://172.16.3.173:9000/api/system/status || exit 1
       - name: Checkout code
         uses: actions/checkout@v2
 
