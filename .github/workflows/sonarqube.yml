@@ -18,28 +18,20 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '11'
-          distribution: 'temurin'  # Spécifiez la distribution Java, par exemple 'temurin'
+          distribution: 'temurin'
 
-
-      - name: Cache SonarQube packages
-        uses: actions/cache@v2
-        with:
-          path: ~/.sonar/cache
-          key: ${{ runner.os }}-sonar-${{ hashFiles('**/*.java') }}
-          restore-keys: |
-          
       - name: Install SonarScanner
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
           unzip sonar-scanner-cli-4.6.2.2472-linux.zip
-          mv sonar-scanner-4.6.2.2472-linux sonar-scanner
-          export PATH=$PATH:$(pwd)/sonar-scanner/bin     ${{ runner.os }}-sonar-
+          mv sonar-scanner-cli-4.6.2.2472-linux sonar-scanner
+          export PATH=$PATH:$(pwd)/sonar-scanner/bin
 
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=kiloutou \
-            -Dsonar.host.url=http://sonarqube:9000/ \
+            -Dsonar.projectKey=VotreProjet \
+            -Dsonar.host.url=http://sonarqube:9000 \
             -Dsonar.login=$SONAR_TOKEN
