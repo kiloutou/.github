@@ -28,6 +28,9 @@ jobs:
           unzip sonar-scanner-cli-4.6.2.2472-linux.zip
           mv sonar-scanner-4.6.2.2472-linux sonar-scanner
           export PATH=$PATH:$(pwd)/sonar-scanner/bin
+          
+      - name: Verify SonarScanner Installation
+        run: sonar-scanner -v    
 
       - name: SonarQube Scan
         env:
