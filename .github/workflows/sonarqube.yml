@@ -22,10 +22,6 @@ jobs:
           rm /tmp/sonar-scanner.zip
           export PATH="$PATH:/tmp/sonar-scanner/bin"
 
-      - name: SonarQube Scan
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: |
           sonar-scanner \
             -Dsonar.projectKey=kiloutou \
             -Dsonar.sources=. \
