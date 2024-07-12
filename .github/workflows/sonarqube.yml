@@ -24,14 +24,13 @@ jobs:
         run: |
           wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.6.2.2472-linux.zip
           unzip sonar-scanner-cli-4.6.2.2472-linux.zip
-          mv sonar-scanner-cli-4.6.2.2472-linux sonar-scanner
-          export PATH=$PATH:$(pwd)/sonar-scanner/bin
+          export PATH=$PATH:$(pwd)/sonar-scanner-cli-4.6.2.2472-linux/bin
 
       - name: SonarQube Scan
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           sonar-scanner \
-            -Dsonar.projectKey=VotreProjet \
+            -Dsonar.projectKey=kiloutou \
             -Dsonar.host.url=http://sonarqube:9000 \
             -Dsonar.login=$SONAR_TOKEN
