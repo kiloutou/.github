@@ -1,0 +1,6 @@
+{
+  "name": "Google Chat Notifications on Pull Request Events",
+  "description": "Send Google Chat notifications on pull requests events (creation, comment, merge...)",
+  "iconName": "octicon git-pull-request",
+  "categories": ["code-review"]
+}

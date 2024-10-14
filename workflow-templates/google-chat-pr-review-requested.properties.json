@@ -1,6 +1,0 @@
-{
-  "name": "Notification on Pull Request submitted",
-  "description": "Sends a Google Chat notification when someone submits a Pull Request.",
-  "iconName": "octicon git-pull-request",
-  "categories": ["code-review"]
-}

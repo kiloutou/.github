@@ -1,0 +1,243 @@
+name: Notify Google Chat for Pull Request Events
+on:
+  pull_request:
+    types:
+      - review_requested
+      - review_comment
+      - closed
+  pull_request_review:
+    types:
+      - submitted
+  pull_request_review_comment:
+    types:
+      - created
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Determine event type and send appropriate notification
+        run: |
+          if [[ "${{ github.event.action }}" == "review_requested" ]]; then
+            # Send a notification for review requested
+            curl --location --request POST '${{ secrets.WEBHOOK }}&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "thread": {
+                  "threadKey": "${{ github.event.pull_request.number }}"
+                },
+                "cardsV2": [
+                  {
+                    "cardId": "unique-card-id-review-requested",
+                    "card": {
+                      "header": {
+                        "title": "🆕 Revue demandée",
+                        "subtitle": "${{ github.event.pull_request.title }}"
+                      },
+                      "sections": [
+                        {
+                          "widgets": [
+                            {
+                              "decoratedText": {
+                                "startIcon": {
+                                  "knownIcon": "PERSON"
+                                },
+                                "text": "${{ github.event.pull_request.user.login }}"
+                              }
+                            },
+                            {
+                              "decoratedText": {
+                                "startIcon": {
+                                  "knownIcon": "BOOKMARK"
+                                },
+                                "text": "PR Review Requested for: ${{ github.event.repository.name }}"
+                              }
+                            },
+                            {
+                              "buttonList": {
+                                "buttons": [
+                                  {
+                                    "text": "OPEN PR",
+                                    "onClick": {
+                                      "openLink": {
+                                        "url": "${{ github.event.pull_request.html_url }}"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+            }'
+            
+          elif [[ "${{ github.event.action }}" == "submitted" && "${{ github.event.review.state }}" == "approved" ]]; then
+            # Send a notification for PR approved
+            curl --location --request POST '${{ secrets.WEBHOOK }}&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "thread": {
+                  "threadKey": "${{ github.event.pull_request.number }}"
+                },
+                "cardsV2": [
+                  {
+                    "cardId": "unique-card-id-pr-approved",
+                    "card": {
+                      "header": {
+                        "title": "✅ PR approuvée par ${{ github.event.review.user.login }}"
+                      },
+                      "sections": [
+                        {
+                          "widgets": [
+                            {
+                              "buttonList": {
+                                "buttons": [
+                                  {
+                                    "text": "OPEN PR",
+                                    "onClick": {
+                                      "openLink": {
+                                        "url": "${{ github.event.pull_request.html_url }}"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+            }'
+
+          elif [[ "${{ github.event.action }}" == "created" && "${{ github.event.pull_request_review_comment }}" ]]; then
+            # Send a notification when a comment is added to the PR
+            curl --location --request POST '${{ secrets.WEBHOOK }}&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "thread": {
+                  "threadKey": "${{ github.event.pull_request.number }}"
+                },
+                "cardsV2": [
+                  {
+                    "cardId": "unique-card-id-comment-added",
+                    "card": {
+                      "header": {
+                        "title": "💬 Commentaire ajouté par ${{ github.event.comment.user.login }}"
+                      },
+                      "sections": [
+                        {
+                          "widgets": [
+                            {
+                              "decoratedText": {
+                                "text": "${{ github.event.comment.body }}"
+                              }
+                            },
+                            {
+                              "buttonList": {
+                                "buttons": [
+                                  {
+                                    "text": "View Comment",
+                                    "onClick": {
+                                      "openLink": {
+                                        "url": "${{ github.event.comment.html_url }}"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+            }'
+
+          elif [[ "${{ github.event.action }}" == "submitted" ]]; then
+            # Send a notification for review submitted (non-approval)
+            curl --location --request POST '${{ secrets.WEBHOOK }}&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "thread": {
+                  "threadKey": "${{ github.event.pull_request.number }}"
+                },
+                "cardsV2": [
+                  {
+                    "cardId": "unique-card-id-review-submitted",
+                    "card": {
+                      "header": {
+                        "title": "💬 Commentaire ajouté par ${{ github.event.review.user.login }}"
+                      },
+                      "sections": [
+                        {
+                          "widgets": [
+                            {
+                              "buttonList": {
+                                "buttons": [
+                                  {
+                                    "text": "OPEN PR",
+                                    "onClick": {
+                                      "openLink": {
+                                        "url": "${{ github.event.pull_request.html_url }}"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+            }'
+
+          elif [[ "${{ github.event.action }}" == "closed" && "${{ github.event.pull_request.merged }}" == "true" ]]; then
+            # Send a notification for PR merged
+            curl --location --request POST '${{ secrets.WEBHOOK }}&messageReplyOption=REPLY_MESSAGE_FALLBACK_TO_NEW_THREAD' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "thread": {
+                  "threadKey": "${{ github.event.pull_request.number }}"
+                },
+                "cardsV2": [
+                  {
+                    "cardId": "unique-card-id-pr-merged",
+                    "card": {
+                      "header": {
+                        "title": "🎉PR Mergée par ${{ github.event.pull_request.merged_by.login }}",
+                        "subtitle": "${{ github.event.pull_request.title }}"
+                      },
+                      "sections": [
+                        {
+                          "widgets": [
+                            {
+                              "buttonList": {
+                                "buttons": [
+                                  {
+                                    "text": "OPEN PR",
+                                    "onClick": {
+                                      "openLink": {
+                                        "url": "${{ github.event.pull_request.html_url }}"
+                                      }
+                                    }
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  }
+                ]
+            }'
+          fi
